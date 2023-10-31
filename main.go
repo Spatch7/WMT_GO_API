@@ -21,6 +21,12 @@ type Alert struct {
 	TeamSlack   string `json:"team_slack"`
 }
 
+type AlertRes struct {
+	ServiceID   string  `json:"service_id"`
+	ServiceName string  `json:"service_name"`
+	Alerts      []Alert `json:"alerts"`
+}
+
 func main() {
 	http.HandleFunc("/alerts", func(w http.ResponseWriter, r *http.Request) {
 		// Post Method
@@ -73,12 +79,17 @@ func main() {
 				http.Error(w, "Invalid end_ts", http.StatusBadRequest)
 				return
 			}
-			alerts := make([]Alert, 0)
 
+			var validAlerts []Alert
 			files, err := os.ReadDir("alerts")
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
+			}
+
+			alertRes := AlertRes{
+				ServiceID:   serviceID,
+				ServiceName: serviceID[:len(serviceID)-3],
 			}
 
 			for _, file := range files {
@@ -101,15 +112,16 @@ func main() {
 						return
 					}
 
-					// Check for valid time-range
+					// Check for valid time-range, append to alerts array
 					if (alert.ServiceID == serviceID) && (alertTime >= startTime) && (alertTime <= endTime) {
-						alerts = append(alerts, alert)
+						validAlerts = append(validAlerts, alert)
 					}
 				}
 			}
 
 			// Return all alerts with appropriate TS and serviceID
-			encodedAlerts, err := json.Marshal(alerts)
+			alertRes.Alerts = validAlerts
+			encodedAlerts, err := json.Marshal(alertRes)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
