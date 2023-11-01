@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -50,13 +49,32 @@ func main() {
 			encodedAlert, _ := json.Marshal(alert)
 			_, err = file.Write(encodedAlert)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				response := struct {
+					AlertID string `json:"alert_id"`
+					Error   string `json:"error"`
+				}{
+					AlertID: alert.AlertID,
+					Error:   err.Error(),
+				}
+
+				encodedResponse, _ := json.Marshal(response)
+				http.Error(w, string(encodedResponse), http.StatusInternalServerError)
 				return
 			}
 
-			fmt.Fprintf(w, "Alert data saved successfully")
+			// Return a success response
+			response := struct {
+				AlertID string `json:"alert_id"`
+				Error   string `json:"error"`
+			}{
+				AlertID: alert.AlertID,
+				Error:   "",
+			}
 
-			// Get Method
+			encodedResponse, _ := json.Marshal(response)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(encodedResponse)
+
 		} else if r.Method == http.MethodGet {
 
 			serviceID := r.URL.Query().Get("service_id")
