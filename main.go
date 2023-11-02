@@ -37,6 +37,12 @@ func main() {
 				return
 			}
 
+			// Check for missing required fields
+			if alert.AlertID == "" || alert.ServiceID == "" || alert.AlertTS == "" {
+				http.Error(w, "Missing required fields in the alert struct", http.StatusInternalServerError)
+				return
+			}
+
 			// Create file for alert
 			file, err := os.Create("alerts/" + alert.AlertID + ".json")
 			if err != nil {
@@ -73,6 +79,7 @@ func main() {
 
 			encodedResponse, _ := json.Marshal(response)
 			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusCreated)
 			w.Write(encodedResponse)
 
 		} else if r.Method == http.MethodGet {
@@ -84,6 +91,7 @@ func main() {
 			if serviceID == "" || startTS == "" || endTS == "" {
 				http.Error(w, " Query paramater missing", http.StatusBadRequest)
 			}
+
 			startTime, err := strconv.ParseInt(startTS, 10, 64)
 			if err != nil {
 				log.Printf("Error parsing start_ts: %v\n", err)
@@ -94,7 +102,7 @@ func main() {
 			endTime, err := strconv.ParseInt(endTS, 10, 64)
 			if err != nil {
 				log.Printf("Error parsing end_ts: %v\n", err)
-				http.Error(w, "Invalid end_ts", http.StatusBadRequest)
+				http.Error(w, "Invalid start_ts", http.StatusBadRequest)
 				return
 			}
 

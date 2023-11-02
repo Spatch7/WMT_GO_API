@@ -5,3 +5,7 @@ Data is stored in local storage via JSON files.
 To run the server:
 > go run main.go
 
+Run tests:
+Start the server.
+In a new terminal, run
+> 
