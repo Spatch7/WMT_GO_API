@@ -1,3 +1,4 @@
+// A program made by Noah Calhoun
 package main
 
 import (
@@ -68,7 +69,7 @@ func main() {
 				return
 			}
 
-			// Return a success response
+			// Return a success response struct
 			response := struct {
 				AlertID string `json:"alert_id"`
 				Error   string `json:"error"`
@@ -83,13 +84,13 @@ func main() {
 			w.Write(encodedResponse)
 
 		} else if r.Method == http.MethodGet {
-
+			// Get Method
 			serviceID := r.URL.Query().Get("service_id")
 			startTS := r.URL.Query().Get("start_ts")
 			endTS := r.URL.Query().Get("end_ts")
 
 			if serviceID == "" || startTS == "" || endTS == "" {
-				http.Error(w, " Query paramater missing", http.StatusBadRequest)
+				http.Error(w, "Query paramater missing", http.StatusBadRequest)
 			}
 
 			startTime, err := strconv.ParseInt(startTS, 10, 64)
@@ -118,6 +119,7 @@ func main() {
 				ServiceName: serviceID[:len(serviceID)-3],
 			}
 
+			// Parse through files for valid Alerts
 			for _, file := range files {
 				if strings.HasSuffix(file.Name(), ".json") {
 					content, err := os.ReadFile("alerts/" + file.Name())
