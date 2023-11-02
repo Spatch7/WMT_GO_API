@@ -3,7 +3,6 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -95,14 +94,14 @@ func main() {
 
 			startTime, err := strconv.ParseInt(startTS, 10, 64)
 			if err != nil {
-				log.Printf("Error parsing start_ts: %v\n", err)
+				// log.Printf("Error parsing start_ts: %v\n", err)
 				http.Error(w, "Invalid start_ts", http.StatusBadRequest)
 				return
 			}
 
 			endTime, err := strconv.ParseInt(endTS, 10, 64)
 			if err != nil {
-				log.Printf("Error parsing end_ts: %v\n", err)
+				// log.Printf("Error parsing end_ts: %v\n", err)
 				http.Error(w, "Invalid start_ts", http.StatusBadRequest)
 				return
 			}
