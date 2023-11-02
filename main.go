@@ -3,6 +3,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -27,6 +28,14 @@ type AlertRes struct {
 }
 
 func main() {
+	// Create alerts folder if not found
+	if _, err := os.Stat("alerts"); os.IsNotExist(err) {
+		err := os.Mkdir("alerts", 0755)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	http.HandleFunc("/alerts", func(w http.ResponseWriter, r *http.Request) {
 		// Post Method
 		if r.Method == http.MethodPost {
